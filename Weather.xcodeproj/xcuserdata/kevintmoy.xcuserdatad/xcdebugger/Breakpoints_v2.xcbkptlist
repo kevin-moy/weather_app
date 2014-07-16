@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Weather/WTTableViewController.m"
-            timestampString = "427163437.375836"
+            timestampString = "427166861.115581"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "125"
-            endingLineNumber = "125"
+            startingLineNumber = "161"
+            endingLineNumber = "161"
             landmarkName = "-jsonTapped:"
             landmarkType = "5">
          </BreakpointContent>

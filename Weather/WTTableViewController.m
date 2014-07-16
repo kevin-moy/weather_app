@@ -41,12 +41,48 @@ static NSString * const BaseURLString = @"http://www.raywenderlich.com/demos/wea
 {
     [super viewDidLoad];
     self.navigationController.toolbarHidden = NO;
-
+    
+    // Determines user's location when view loads and Core Location manager reports location
+    self.locationManager = [[CLLocationManager alloc] init];
+    self.locationManager.delegate = self;
+    
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+}
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+    // Last object contains the most recent location
+    CLLocation *newLocation = [locations lastObject];
+    
+    // If the location is more than 5 minutes old, ignore it
+    if([newLocation.timestamp timeIntervalSinceNow] > 300)
+        return;
+    
+    [self.locationManager stopUpdatingLocation];
+    
+    WeatherHTTPClient *client = [WeatherHTTPClient sharedWeatherHTTPClient];
+    client.delegate = self;
+    [client updateWeatherAtLocation:newLocation forNumberOfDays:3];
+}
+
+// If succeeds, update weather data
+- (void)weatherHTTPClient:(WeatherHTTPClient *)client didUpdateWithWeather:(id)weather
+{
+    self.weather = weather;
+    self.title = @"API Updated";
+    [self.tableView reloadData];
+}
+// If doesn't succeed, put error message
+- (void)weatherHTTPClient:(WeatherHTTPClient *)client didFailWithError:(NSError *)error
+{
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Error Retrieving Weather"
+                                                        message:[NSString stringWithFormat:@"%@",error]
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alertView show];
 }
 
 - (void)didReceiveMemoryWarning
@@ -186,7 +222,7 @@ static NSString * const BaseURLString = @"http://www.raywenderlich.com/demos/wea
 
 - (IBAction)apiTapped:(id)sender
 {
-    
+    [self.locationManager startUpdatingLocation];
 }
 
 #pragma mark - Table view data source
